@@ -1,0 +1,2 @@
+-- See the matching function in the connected Anaira Clinic Supabase project migration history.
+-- This migration is recorded here as a release artifact; do not blindly reapply if already applied.

@@ -1,0 +1,29 @@
+{
+  "name": "anaira-clinic-management",
+  "version": "0.8.40",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "verify:static": "node scripts/verify-project.mjs",
+    "test:security-static": "node scripts/verify-project.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "idb": "^8.0.3",
+    "lucide-react": "^0.468.0",
+    "next": "^15.5.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.9",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.5.6",
+    "typescript": "^5.9.2"
+  }
+}
