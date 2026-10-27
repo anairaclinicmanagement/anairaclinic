@@ -1,6 +1,6 @@
 {
   "name": "anaira-clinic-management",
-  "version": "0.8.40",
+  "version": "0.8.45",
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
