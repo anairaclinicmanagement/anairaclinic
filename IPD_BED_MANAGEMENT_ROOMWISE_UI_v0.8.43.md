@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.43 — Room-wise IPD Bed Management UI
+# Anaira Healthcare v0.8.43 — Room-wise IPD Bed Management UI
 
 ## Included
 - Replaced the flat individual-bed table with a responsive room-wise bed-card layout.

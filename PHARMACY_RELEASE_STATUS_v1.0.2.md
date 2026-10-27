@@ -1,4 +1,4 @@
-# Anaira Clinic Pharmacy Store v1.0.2
+# Anaira Healthcare Pharmacy Store v1.0.2
 
 ## Included
 - Existing Supabase-backed medicine/product catalogue, product categories, SKU/HSN/unit/manufacturer fields, per-item GST, active/deactivate workflow.

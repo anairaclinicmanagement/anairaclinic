@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.36 — IPD Patient Admission & Individual Beds
+# Anaira Healthcare v0.8.36 — IPD Patient Admission & Individual Beds
 
 ## Implemented in source
 - Extended IPD admission capture: admission type (routine/emergency/daycare/maternity/transfer), date/time, referral source, provisional diagnosis, department, consultant, attendant details and notes.

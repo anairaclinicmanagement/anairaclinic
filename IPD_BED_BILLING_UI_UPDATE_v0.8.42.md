@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.42 — IPD / Bed / Billing UI update
+# Anaira Healthcare v0.8.42 — IPD / Bed / Billing UI update
 
 - Sidebar terminology standardized: OPD, Prescription, and IPD / Bed Management.
 - OPD page user-facing Hinglish prompts converted to English where identified.

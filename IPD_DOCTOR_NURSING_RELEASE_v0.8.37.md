@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.37 — Doctor & Nursing IPD workflows
+# Anaira Healthcare v0.8.37 — Doctor & Nursing IPD workflows
 
 ## Included
 - Doctor & Clinical Details modal now saves admission-linked visit entries, initial assessment, diagnosis, progress notes, doctor orders, treatment plans, consultant notes, and follow-up dates using `create_ipd_clinical_record`.

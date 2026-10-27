@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.29 — Reference UI update
+# Anaira Healthcare v0.8.29 — Reference UI update
 
 ## Scope completed in this patch
 - Applied Anaira branding and a hospital-style navy/blue visual system based on the supplied reference screenshots; third-party Pehal Grewal Hospital branding is not used in the product.

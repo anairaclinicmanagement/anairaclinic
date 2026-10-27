@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.34 — IPD workflow update
+# Anaira Healthcare v0.8.34 — IPD workflow update
 
 ## Included
 - Added clinic-scoped, audited IPD bed-transfer history and an RPC that validates the destination room's capacity and clinic ownership.
@@ -9,7 +9,7 @@
 
 ## Database
 Migration: `20261026100000_anaira_ipd_nursing_and_bed_transfer.sql`.
-Applied to the connected Anaira Clinic Supabase project during this work; result returned success.
+Applied to the connected Anaira Healthcare Supabase project during this work; result returned success.
 
 ## Verification status
 - Static project verification: PASS (`node scripts/verify-project.mjs`).

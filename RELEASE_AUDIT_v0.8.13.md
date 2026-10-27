@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.13 — Tenant and Responsive UI Audit
+# Anaira Healthcare v0.8.13 — Tenant and Responsive UI Audit
 
 ## Implemented
 - Added patient salutation (`Mr.`, `Miss`, `Mrs.`, `Ms.`, `Master`, `Dr.`), father name and husband name fields to the new-patient flow on OPD intake.

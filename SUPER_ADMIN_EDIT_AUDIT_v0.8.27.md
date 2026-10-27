@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.27 — Super Admin Edit Modal & Save Audit
+# Anaira Healthcare v0.8.27 — Super Admin Edit Modal & Save Audit
 
 ## Source changes
 - Edit clinic form now renders in a fixed viewport overlay with dimmed backdrop, centered responsive panel, and internal scrolling; it no longer pushes the page down.

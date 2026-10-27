@@ -1,4 +1,4 @@
-# Anaira Clinic OPD completion pass v0.8.33
+# Anaira Healthcare OPD completion pass v0.8.33
 
 ## Implemented in source
 - Reference-inspired OPD header with patient search (Name / UHID / mobile), registration panel, multi-colour action tiles, daily summary, recent patients and queue worklist.
@@ -7,7 +7,7 @@
 - Registration clear action; post-create parchi print and queue reprint/view controls.
 - Queue filters by date, department, doctor and search text; doctor results are additionally filtered to the logged-in doctor's assigned visits.
 - Today's summary uses local calendar dates and counts new registrations/follow-ups.
-- Added `opd_visits.remarks` schema field through Supabase migration `anaira_opd_reception_remarks_v0833`; migration applied successfully to linked Anaira Clinic Supabase project `gdyvzvzmybbvufggxjty`.
+- Added `opd_visits.remarks` schema field through Supabase migration `anaira_opd_reception_remarks_v0833`; migration applied successfully to linked Anaira Healthcare Supabase project `gdyvzvzmybbvufggxjty`.
 - Existing consultation note save and lab/pharmacy order processing RPC workflows retained.
 
 ## Validation performed

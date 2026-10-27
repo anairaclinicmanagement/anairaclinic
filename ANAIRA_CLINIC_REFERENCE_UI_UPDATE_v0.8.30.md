@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.30 — Reference UI update
+# Anaira Healthcare v0.8.30 — Reference UI update
 
 ## Scope completed in this patch
 - Added an 11-card, multi-colour IPD navigation overview mapped to existing admission, room, billing, OPD, lab, pharmacy, OT, reports and settings routes/sections. Cards do not falsely imply that unimplemented nursing charts, bed transfers, or advanced clinical flows are already complete.

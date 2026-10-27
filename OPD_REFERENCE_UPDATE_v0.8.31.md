@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.31 — OPD Reference Screen Update
+# Anaira Healthcare v0.8.31 — OPD Reference Screen Update
 
 ## Implemented
 - Added OPD workspace styling based on the supplied reference: navy/blue clinical theme, pastel multi-colour navigation cards, styled forms/tables, responsive layout, quick actions, today's OPD summary and recent-patient shortcuts.
@@ -8,7 +8,7 @@
 - Added idempotent database migration for `opd_visits.referred_by` and `opd_visits.visit_type`.
 
 ## Supabase
-- Project: `gdyvzvzmybbvufggxjty` (Anaira Clinic).
+- Project: `gdyvzvzmybbvufggxjty` (Anaira Healthcare).
 - Migration `anaira_opd_reference_fields_v0831` was applied successfully.
 - Verified the two columns exist in `public.opd_visits`.
 

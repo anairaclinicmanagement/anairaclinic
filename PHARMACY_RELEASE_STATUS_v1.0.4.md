@@ -1,4 +1,4 @@
-# Anaira Clinic Pharmacy Store v1.0.4 — Clinic/data loading fix
+# Anaira Healthcare Pharmacy Store v1.0.4 — Clinic/data loading fix
 
 ## Changes
 - Pharmacy data loader now validates the active Supabase session and resolves clinic membership before querying product and batch records.

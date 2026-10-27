@@ -1,4 +1,4 @@
-# Anaira Clinic Pharmacy Store v1.0.7 — Search, Branding & A5 Print
+# Anaira Healthcare Pharmacy Store v1.0.7 — Search, Branding & A5 Print
 
 ## Changes
 - Pharmacy status message no longer displays routine "Pharmacy data loaded..." counts as a banner. Pharmacy heading uses the configured store name and shows logo, address and phone when configured.

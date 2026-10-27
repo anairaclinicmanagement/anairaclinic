@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.25 — Shared IPD Billing
+# Anaira Healthcare v0.8.25 — Shared IPD Billing
 
 ## Changes
 - Adds `invoices.admission_id` and a clinic/admission invoice index.

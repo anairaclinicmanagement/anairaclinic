@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.18 — Build Fix Audit
+# Anaira Healthcare v0.8.18 — Build Fix Audit
 
 ## Changes in this patch
 - `components/Sidebar.tsx`: added a TypeScript type predicate when filtering optional mobile navigation links, so `mobileLinks` is an array of actual link entries rather than entries that may be `undefined`. This addresses the reported `p is possibly undefined` and `icon does not exist ... | undefined` diagnostics.

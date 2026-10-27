@@ -1,4 +1,4 @@
-# Anaira Clinic Pharmacy Store v1.0.3 — UI and build fixes
+# Anaira Healthcare Pharmacy Store v1.0.3 — UI and build fixes
 
 ## Changes
 - Removed duplicate Pharmacy navigation row. The remaining single navigation includes Overview, Products, Stock & expiry, Billing, Reports, and Store settings.

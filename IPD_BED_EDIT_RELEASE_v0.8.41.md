@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.41 — IPD Bed Edit
+# Anaira Healthcare v0.8.41 — IPD Bed Edit
 
 ## Changes
 - Added an **Edit bed** action to each active physical-bed row in IPD & Beds.

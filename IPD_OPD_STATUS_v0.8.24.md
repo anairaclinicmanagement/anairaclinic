@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.24 — OPD/IPD status
+# Anaira Healthcare v0.8.24 — OPD/IPD status
 
 ## Existing modules
 - OPD is present at `/opd` and includes reception parchi/queue workflow and linked-order migrations.

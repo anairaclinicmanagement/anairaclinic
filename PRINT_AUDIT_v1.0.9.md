@@ -1,4 +1,4 @@
-# Anaira Clinic Print Audit v1.0.9
+# Anaira Healthcare Print Audit v1.0.9
 
 ## Changes
 - Reworked OPD parchi to follow the supplied reference structure: validity and fee line, clinic name, patient demographics, OPD registration/visit number, date/time, UHID, phone/address, department/doctor/room, investigations, complaint, examination, provisional diagnosis, advice/medicines, findings column, and doctor signature.

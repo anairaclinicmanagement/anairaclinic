@@ -1,4 +1,4 @@
-# Anaira Clinic Pharmacy Store v1.0.5 — Advanced Workflow Update
+# Anaira Healthcare Pharmacy Store v1.0.5 — Advanced Workflow Update
 
 ## Included
 - Added clinic-scoped Pharmacy Suppliers master (create, list, deactivate; supplier contact, GSTIN, address and notes).

@@ -1,3 +1,3 @@
 'use client';
-import AdvancedOperations from '@/components/AdvancedOperations';
-export default function Page() { return <AdvancedOperations initialModule="emergency" />; }
+import ClinicalOperations from '@/components/ClinicalOperations';
+export default function EmergencyPage(){return <ClinicalOperations mode="emergency"/>;}

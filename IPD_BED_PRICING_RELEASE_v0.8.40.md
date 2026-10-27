@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.40 — IPD Bed Tariff
+# Anaira Healthcare v0.8.40 — IPD Bed Tariff
 
 ## Included
 - Added `room_beds.price_per_12_hours` with a non-negative numeric constraint and clinic-scoped index.

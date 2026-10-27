@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.26 — Super Admin audit and changes
+# Anaira Healthcare v0.8.26 — Super Admin audit and changes
 
 ## Changes in this package
 - Added an **Edit clinic** action to the Super Admin Clinic & hospital registry.

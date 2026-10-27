@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.28 — A-to-Z Static Audit
+# Anaira Healthcare v0.8.28 — A-to-Z Static Audit
 
 ## Executive result
 

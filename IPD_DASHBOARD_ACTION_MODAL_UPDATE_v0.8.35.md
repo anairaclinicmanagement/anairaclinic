@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.35 — IPD Dashboard Action Modals
+# Anaira Healthcare v0.8.35 — IPD Dashboard Action Modals
 
 ## Included
 - Updated IPD dashboard cards to behave as keyboard-accessible buttons instead of passive anchor cards.

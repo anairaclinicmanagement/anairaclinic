@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.17 — TypeScript Build Fix Audit
+# Anaira Healthcare v0.8.17 — TypeScript Build Fix Audit
 
 ## Fixes
 - `components/AppShell.tsx`: resolve the active clinic ID to a validated non-null `string` before persisting it. This fixes the reported `string | null` error at the clinic membership selection step.

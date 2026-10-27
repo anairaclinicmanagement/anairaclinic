@@ -39,7 +39,7 @@ export default function Pharmacy(){
    supabase.from('pharmacy_suppliers').select('id,supplier_name,phone,email,gstin,address,notes,active').eq('clinic_id',clinicId).eq('active',true).order('supplier_name').limit(1000)
   ]);
   if(me||be||pe||re||cse){setMsg(`Pharmacy data load issue for clinic ${clinicId}: ${[me&&`products: ${me.message}`,be&&`stock: ${be.message}`,pe&&`patients: ${pe.message}`,re&&`prescriptions: ${re.message}`,cse&&`settings: ${cse.message}`].filter(Boolean).join(' | ')}`)}
-  else if(!m?.length&&!b?.length){const host=process.env.NEXT_PUBLIC_SUPABASE_URL||'URL not configured';setMsg(`Connected, but no products/stock returned for clinic ${clinicId}. Database has demo inventory in the intended project; check .env.local project URL (${host}) and clinic selection.`)}
+  else if(!m?.length&&!b?.length){setMsg('No medicines or stock batches were found for this clinic. Check the selected clinic and add medicines or receive stock to begin pharmacy operations.')}
   else if(!m?.length||!b?.length){setMsg(`Partial pharmacy data for clinic ${clinicId}: ${m?.length||0} active products, ${b?.length||0} stock batches. Check RLS policies or clinic_id consistency.`)}
   else setMsg(`Pharmacy data loaded: ${m.length} active products and ${b.length} stock batches for clinic ${clinicId}.`);
   if(m)setItems(m as Medicine[]);if(b)setBatches(b as Batch[]);if(p)setPatients(p.map(patientFromRow));if(r)setRxs(r as Rx[]);if(sup)setSuppliers(sup as Supplier[]);if(supError)setMsg((prev)=>[prev,`Suppliers: ${supError.message}`].filter(Boolean).join(' | '));

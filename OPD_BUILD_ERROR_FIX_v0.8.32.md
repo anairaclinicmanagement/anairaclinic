@@ -1,4 +1,4 @@
-# Anaira Clinic v0.8.32 — OPD JSX Build Error Fix
+# Anaira Healthcare v0.8.32 — OPD JSX Build Error Fix
 
 - Fixed the invalid multiline JSX `placeholder` attribute in `app/opd/page.tsx` by using a JSX expression string.
 - Fixed the OPD registration/quick-actions layout wrapper so the section and sidebar are valid siblings inside `.opd-main-layout`.
