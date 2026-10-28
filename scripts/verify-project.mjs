@@ -7,7 +7,7 @@ const errors = [];
 const warnings = [];
 const mustExist = [
   'app/page.tsx','app/login/page.tsx','app/setup/page.tsx','app/super-admin/page.tsx',
-  'app/patients/page.tsx','app/appointments/page.tsx','app/consultation/page.tsx',
+  'app/patients/page.tsx','app/doctors/page.tsx','app/appointments/page.tsx','app/consultation/page.tsx',
   'app/billing/page.tsx','app/laboratory/page.tsx','app/pharmacy/page.tsx','app/prescriptions/page.tsx','app/ipd/page.tsx',
   'components/AdvancedOperations.tsx','lib/supabase.ts','lib/offline.ts',
   'supabase/migrations/20261011100000_anaira_clinic_initial_core_schema.sql',
@@ -19,7 +19,7 @@ const mustExist = [
 for (const file of mustExist) if (!fs.existsSync(path.join(root, file))) errors.push(`Missing required file: ${file}`);
 const appDir = path.join(root, 'app');
 const routes = fs.readdirSync(appDir, {withFileTypes:true}).filter(x=>x.isDirectory()).map(x=>x.name);
-for (const route of ['patients','appointments','consultation','billing','laboratory','pharmacy','prescriptions','ipd','super-admin','procurement','radiology','operation-theatre','emergency','blood-bank','cssd','diet','ambulance','insurance','hr-payroll','telemedicine','referrals','clinical-quality']) {
+for (const route of ['patients','appointments','consultation','billing','laboratory','pharmacy','prescriptions','ipd','super-admin','procurement','radiology','operation-theatre','emergency','doctors','blood-bank','cssd','diet','ambulance','insurance','hr-payroll','telemedicine','referrals','clinical-quality']) {
   if (!routes.includes(route)) errors.push(`Missing required route directory: app/${route}`);
 }
 const patientsSource = fs.readFileSync(path.join(root,'app/patients/page.tsx'),'utf8');
@@ -84,3 +84,8 @@ for (const w of warnings) console.warn(`WARN: ${w}`);
 for (const e of errors) console.error(`FAIL: ${e}`);
 if (errors.length) process.exit(1);
 console.log('PASS: static structure and migration safety checks. This does NOT replace TypeScript, production build, database, browser E2E, or tenant-isolation tests.');
+
+const doctorsSource = fs.readFileSync(path.join(root,'app/doctors/page.tsx'),'utf8');
+for (const required of ['Add Doctor','Save Doctor Details','Create Doctor Login','staff_profile_id','qualification','registration_number']) if (!doctorsSource.includes(required)) errors.push(`Doctor directory workflow missing: ${required}`);
+const staffFn = fs.readFileSync(path.join(root,'supabase/functions/clinic-create-staff/index.ts'),'utf8');
+for (const required of ['staff_profile_id','Link a previously saved doctor profile','user_id']) if (!staffFn.includes(required)) errors.push(`Existing doctor profile login-link workflow missing: ${required}`);

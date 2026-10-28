@@ -15,7 +15,7 @@ Deno.serve(async (req: Request) => {
   if (userError || !user) return reply({ error: 'Session is invalid or expired.' }, 401);
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return reply({ error: 'Invalid JSON body.' }, 400); }
-  const clinicId = String(body.clinic_id || ''), fullName = String(body.full_name || '').trim(), email = String(body.email || '').trim().toLowerCase(), phone = String(body.phone || '').trim(), username = String(body.username || '').trim().toLowerCase(), loginId = String(body.login_id || '').trim(), password = String(body.password || ''), role = String(body.role || 'staff');
+  const clinicId = String(body.clinic_id || ''), staffProfileId = String(body.staff_profile_id || '').trim(), fullName = String(body.full_name || '').trim(), email = String(body.email || '').trim().toLowerCase(), phone = String(body.phone || '').trim(), username = String(body.username || '').trim().toLowerCase(), loginId = String(body.login_id || '').trim(), password = String(body.password || ''), role = String(body.role || 'staff');
   const allowed = ['doctor','receptionist','nurse','pharmacist','lab_technician','radiology_technician','xray_technician','ultrasound_technician','ct_mri_technician','accountant','staff'];
   if (!/^[0-9a-f-]{36}$/i.test(clinicId)) return reply({ error: 'Select a valid clinic.' }, 400);
   if (fullName.length < 2 || fullName.length > 160) return reply({ error: 'Name must be 2–160 characters.' }, 400);
@@ -41,8 +41,23 @@ Deno.serve(async (req: Request) => {
   const uid = created.user.id;
   const { error: linkError } = await admin.from('clinic_members').insert({ clinic_id: clinicId, user_id: uid, role, display_name: fullName, active: true });
   if (linkError) { await admin.auth.admin.deleteUser(uid); return reply({ error: `Could not assign clinic role: ${linkError.message}` }, 400); }
-  const { error: profileError } = await admin.from('staff_profiles').insert({ clinic_id: clinicId, user_id: uid, full_name: fullName, role, email: email || (isEmailLogin ? loginId : null), phone: phone || (isPhoneLogin ? loginId : null), username: normalizedUsername || null, staff_code: String(body.staff_code || '').trim() || null, specialty: String(body.specialty || '').trim() || null, room_number: String(body.room_number || '').trim() || null, active: true, metadata: { created_by: user.id, invite_sent: false, password_set_by_admin: true, login_id_type: isEmailLogin ? 'email' : isPhoneLogin ? 'phone' : 'username', department: String(body.department || '').trim() || null, diagnostic_modality: String(body.diagnostic_modality || '').trim() || null, medical_registration_number: String(body.registration_number || '').trim() || null } });
-  if (profileError) { await admin.from('clinic_members').delete().eq('clinic_id', clinicId).eq('user_id', uid); await admin.auth.admin.deleteUser(uid); return reply({ error: `Could not create staff profile: ${profileError.message}` }, 400); }
+  let profileError: { message: string } | null = null;
+  if (staffProfileId) {
+    // Link a previously saved doctor profile instead of creating a duplicate profile.
+    const { data: existingProfile, error: existingError } = await admin.from('staff_profiles').select('id,user_id,role,metadata').eq('id', staffProfileId).eq('clinic_id', clinicId).maybeSingle();
+    if (existingError || !existingProfile || existingProfile.role !== 'doctor' || existingProfile.user_id) {
+      await admin.from('clinic_members').delete().eq('clinic_id', clinicId).eq('user_id', uid);
+      await admin.auth.admin.deleteUser(uid);
+      return reply({ error: existingError?.message || 'Doctor profile was not found, is not a doctor, or already has a login.' }, 409);
+    }
+    const mergedMetadata = { ...(existingProfile.metadata || {}), created_by: user.id, invite_sent: false, password_set_by_admin: true, login_id_type: isEmailLogin ? 'email' : isPhoneLogin ? 'phone' : 'username', department: String(body.department || '').trim() || (existingProfile.metadata || {}).department || null, diagnostic_modality: String(body.diagnostic_modality || '').trim() || null, medical_registration_number: String(body.registration_number || '').trim() || null };
+    const { error } = await admin.from('staff_profiles').update({ user_id: uid, email: email || (isEmailLogin ? loginId : null), phone: phone || (isPhoneLogin ? loginId : null), username: normalizedUsername || null, metadata: mergedMetadata }).eq('id', staffProfileId).eq('clinic_id', clinicId).is('user_id', null);
+    profileError = error;
+  } else {
+    const { error } = await admin.from('staff_profiles').insert({ clinic_id: clinicId, user_id: uid, full_name: fullName, role, email: email || (isEmailLogin ? loginId : null), phone: phone || (isPhoneLogin ? loginId : null), username: normalizedUsername || null, staff_code: String(body.staff_code || '').trim() || null, specialty: String(body.specialty || '').trim() || null, room_number: String(body.room_number || '').trim() || null, active: true, metadata: { created_by: user.id, invite_sent: false, password_set_by_admin: true, login_id_type: isEmailLogin ? 'email' : isPhoneLogin ? 'phone' : 'username', department: String(body.department || '').trim() || null, diagnostic_modality: String(body.diagnostic_modality || '').trim() || null, medical_registration_number: String(body.registration_number || '').trim() || null } });
+    profileError = error;
+  }
+  if (profileError) { await admin.from('clinic_members').delete().eq('clinic_id', clinicId).eq('user_id', uid); await admin.auth.admin.deleteUser(uid); return reply({ error: `Could not link/create staff profile: ${profileError.message}` }, 400); }
   await admin.from('audit_logs').insert({ clinic_id: clinicId, actor_user_id: user.id, action: 'create_staff_login', entity_type: 'staff_profile', entity_id: uid, details: { staff_email: email || null, login_id: loginId, role, department: String(body.department || '').trim() || null, diagnostic_modality: String(body.diagnostic_modality || '').trim() || null } });
   return reply({ user_id: uid, email: email || null, phone: phone || (isPhoneLogin ? loginId : null), username: normalizedUsername || null, login_id: loginId, auth_email: authEmail, role, clinic_id: clinicId, status: 'created', invite_sent: false, password_set_by_admin: true }, 201);
 });
