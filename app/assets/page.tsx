@@ -1,3 +1,3 @@
 'use client';
-import AdvancedOperations from '@/components/AdvancedOperations';
-export default function Page() { return <AdvancedOperations initialModule="assets" />; }
+import AssetsMaintenanceWorkspace from '@/components/AssetsMaintenanceWorkspace';
+export default function AssetsPage(){return <AssetsMaintenanceWorkspace/>;}

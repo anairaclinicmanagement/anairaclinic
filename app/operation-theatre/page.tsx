@@ -1,3 +1,3 @@
 'use client';
-import ClinicalOperations from '@/components/ClinicalOperations';
-export default function OperationTheatrePage(){return <ClinicalOperations mode="operation_theatre"/>;}
+import OperationTheatreWorkspace from '@/components/OperationTheatreWorkspace';
+export default function OperationTheatrePage(){return <OperationTheatreWorkspace/>;}
