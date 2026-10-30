@@ -1942,3 +1942,593 @@ body:has(.login-screen) {
 @media(max-width:1100px){.ipd-reference-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.ipd-reference-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ipd-ref-card{min-height:100px;padding:10px}.ipd-reference-title{align-items:flex-start;flex-direction:row}.ipd-ref-card small{font-size:9px}.modal .form-grid{grid-template-columns:1fr}}
 @media(max-width:480px){.ipd-reference-grid{grid-template-columns:1fr}.ipd-reference-title{flex-direction:column}.ipd-module-actions{grid-template-columns:1fr}.modal .panel-heading{align-items:flex-start;gap:8px}.modal .form-actions>*{flex:1}}
+
+
+/* v0.8.120 — ACTUAL JSX SELECTOR FIX.
+   The current OPD markup uses .opd-parchi-letterhead-wrap and
+   .opd-generated-letterhead. Older print overrides only targeted the removed
+   .opd-parchi-header element, so the real wrapper escaped those overrides.
+   Normalize the actual wrapper and generated header in print mode. */
+@media print {
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-generated-letterhead,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap.opd-generated-letterhead,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    border-top: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-print-color-adjust: economy !important;
+    print-color-adjust: economy !important;
+  }
+
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap::before,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap::after,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated::before,
+  html body:has(.opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated::after {
+    content: none !important;
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 0 3mm !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated {
+    display: flex !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 2mm 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #d5e0e8 !important;
+    color: #173f5f !important;
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+  }
+
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details *,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-subtitle {
+    color: #173f5f !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  html body:has(.opd-parchi-paper.opd-paper-preprinted) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap,
+  html body:has(.opd-parchi-paper.opd-paper-preprinted) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated {
+    display: none !important;
+  }
+
+  html body:has(.opd-parchi-paper.opd-paper-preprinted) .opd-workspace .print-prescription .opd-parchi-paper > .opd-preprinted-top-spacer {
+    display: block !important;
+    box-sizing: border-box !important;
+    flex: 0 0 76.2mm !important;
+    width: 100% !important;
+    height: 76.2mm !important;
+    min-height: 76.2mm !important;
+    max-height: 76.2mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    background-image: none !important;
+  }
+}
+
+/* v0.8.122 — OPD print: paint the actual generated-letterhead containers white.
+   v0.8.121 made these containers transparent, which can expose a dark inherited
+   background in Chromium print compositing. Keep the real logo/text untouched. */
+@media print {
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap.opd-generated-letterhead,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap.opd-generated-letterhead > .opd-letterhead-generated {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    border-top: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    isolation: auto !important;
+  }
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap.opd-generated-letterhead > .opd-letterhead-generated {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 5mm !important;
+    min-height: 25mm !important;
+    padding: 3mm 4mm !important;
+    color: #173f5f !important;
+    border: 0 !important;
+    border-bottom: 1px solid #d5e0e8 !important;
+  }
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated img {
+    display: block !important;
+    background: transparent !important;
+    object-fit: contain !important;
+    box-shadow: none !important;
+  }
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details h1,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-subtitle,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details > div {
+    color: #173f5f !important;
+    background: transparent !important;
+    background-image: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap::before,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap::after,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated::before,
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated::after {
+    content: none !important;
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  html body:has(.opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-header {
+    display: none !important;
+  }
+}
+
+/* v0.8.123 — definitive OPD print top-band reset.
+   The visible blue strip is a generated/decorative print layer above the actual
+   letterhead. The current JSX uses a real .opd-parchi-letterhead-wrap node;
+   never use a pseudo-element as a header/spacer. Keep the real clinic logo and
+   text, and keep the real preprinted spacer only in preprinted mode. */
+@media print {
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription > .panel-heading {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper::before,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper::after,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap::before,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap::after,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated::before,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-generated::after,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-parchi-header::before,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .print-prescription .opd-parchi-paper .opd-parchi-header::after {
+    content: none !important;
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap > .opd-letterhead-generated {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    color: #173f5f !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    filter: none !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 3mm !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap > .opd-letterhead-generated {
+    display: flex !important;
+    position: static !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 25mm !important;
+    margin: 0 !important;
+    padding: 3mm 4mm !important;
+    border: 0 !important;
+    border-bottom: 1px solid #d5e0e8 !important;
+    color: #173f5f !important;
+    background: #fff !important;
+    background-image: none !important;
+    isolation: auto !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details *,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-subtitle {
+    color: #173f5f !important;
+    background: transparent !important;
+    background-image: none !important;
+    text-shadow: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted) .opd-workspace .print-prescription .opd-parchi-paper > .opd-preprinted-top-spacer {
+    display: block !important;
+    flex: 0 0 76.2mm !important;
+    width: 100% !important;
+    height: 76.2mm !important;
+    min-height: 76.2mm !important;
+    max-height: 76.2mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    background-image: none !important;
+  }
+}
+
+
+/* v0.8.124 — OPD plain-paper print: remove inherited/decorative blue paint.
+   Apply the reset to every element inside the printed parchi, not only the
+   letterhead classes. The paper and actual letterhead remain white; text and
+   logo remain visible. Screen styling is intentionally unchanged. */
+@media print {
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription > .panel-heading,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    outline: 0 !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription::before,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription::after,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper::before,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper::after,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper *::before,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper *::after {
+    content: none !important;
+    display: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap > .opd-letterhead-generated {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    border-top: 0 !important;
+    outline: 0 !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper > .opd-parchi-letterhead-wrap * {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-details *,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription .opd-parchi-paper .opd-letterhead-subtitle {
+    color: #173f5f !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain)
+  .opd-workspace .print-prescription > .panel-heading {
+    display: none !important;
+  }
+}
+
+/* v0.8.127 — OPD print: hard reset of every legacy blue paint layer.
+   This is deliberately scoped to the actual OPD paper in print mode. It
+   neutralizes inherited backgrounds on descendants and pseudo-elements,
+   then restores the real paper and generated clinic letterhead. */
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html:has(body .opd-workspace .opd-parchi-paper),
+  html:has(body .opd-workspace .opd-parchi-paper) body,
+  body:has(.opd-workspace .opd-parchi-paper),
+  body:has(.opd-workspace .opd-parchi-paper) .app-shell,
+  body:has(.opd-workspace .opd-parchi-paper) .main-area,
+  body:has(.opd-workspace .opd-parchi-paper) .page-content,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace,
+  body:has(.opd-workspace .opd-parchi-paper) .print-prescription {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) * {
+    -webkit-print-color-adjust: economy !important;
+    print-color-adjust: economy !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper * {
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper * {
+    background-color: transparent !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper::before,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper::after {
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    content: none;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper {
+    display: block !important;
+    position: absolute !important;
+    top: 8mm !important;
+    left: 10mm !important;
+    width: 190mm !important;
+    min-height: 277mm !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #172b3e !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 9pt !important;
+    line-height: 1.25 !important;
+    overflow: visible !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper *::before,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-paper *::after,
+  body:has(.opd-workspace .opd-parchi-paper)::before,
+  body:has(.opd-workspace .opd-parchi-paper)::after {
+    content: none !important;
+    display: none !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-parchi-letterhead-wrap,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-generated {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    color: #173f5f !important;
+    isolation: auto !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-generated {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 5mm !important;
+    min-height: 25mm !important;
+    padding: 2mm 3mm !important;
+    border-bottom: 1px solid #d5e0e8 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-details,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-details *,
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-subtitle {
+    color: #173f5f !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-details h1 {
+    color: #173f5f !important;
+    font-size: 17pt !important;
+    margin: 0 0 1.5mm !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-plain) .opd-letterhead-generated img {
+    display: block !important;
+    width: 21mm !important;
+    height: 21mm !important;
+    max-width: 21mm !important;
+    max-height: 21mm !important;
+    object-fit: contain !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-valid,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-parchi-document-title {
+    background: transparent !important;
+    color: #173f5f !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .print-prescription > .panel-heading,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace > .page-heading,
+  body:has(.opd-workspace .opd-parchi-paper) .sidebar,
+  body:has(.opd-workspace .opd-parchi-paper) .topbar {
+    display: none !important;
+  }
+}
+
+
+/* v0.8.128 — Fill the A4 writing area without changing the approved header
+   or patient-detail geometry. The previous auto-height paper could satisfy
+   min-height without giving flex children a definite height to distribute. */
+@media print {
+  @page { size: A4 portrait; margin: 0 !important; }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    top: 8mm !important;
+    left: 10mm !important;
+    width: 190mm !important;
+    height: 281mm !important;
+    min-height: 281mm !important;
+    max-height: 281mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper > .opd-parchi-letterhead-wrap,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper > .opd-parchi-preprinted-meta,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper > .opd-patient-grid,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper > .opd-parchi-footer {
+    flex: 0 0 auto !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper > .opd-writing-grid {
+    flex: 1 1 0% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    align-self: stretch !important;
+    display: grid !important;
+    grid-template-columns: 18mm minmax(0, 1fr) 20mm !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper .opd-main-writing {
+    display: grid !important;
+    grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper .opd-main-writing > section {
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper .opd-investigations,
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper .opd-investigation-findings {
+    height: 100% !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    box-sizing: border-box !important;
+  }
+
+  body:has(.opd-workspace .opd-parchi-paper) .opd-workspace .opd-parchi-paper > .opd-parchi-footer {
+    margin-top: 2mm !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+
+/* v0.8.129 — Pre-printed letterhead mode: reduce the physical letterhead
+   blank header reservation from 3 inches (76.2mm) to 2 inches (50.8mm).
+   This targets only the real spacer in pre-printed mode; plain A4 mode and
+   the approved generated header/patient details remain unchanged. */
+@media print {
+  body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper > .opd-preprinted-top-spacer {
+    display: block !important;
+    flex: 0 0 50.8mm !important;
+    width: 100% !important;
+    height: 50.8mm !important;
+    min-height: 50.8mm !important;
+    max-height: 50.8mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    background-image: none !important;
+  }
+}
