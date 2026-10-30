@@ -2532,3 +2532,60 @@ body:has(.login-screen) {
     background-image: none !important;
   }
 }
+
+
+/* v0.8.130 — Pre-printed letterhead: keep patient details and the final
+   doctor-signature line, but leave the entire middle writing area blank.
+   Plain-paper OPD printing is intentionally unaffected. */
+@media print {
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper.opd-paper-preprinted > .opd-writing-grid {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper.opd-paper-preprinted > .opd-writing-grid > *,
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper.opd-paper-preprinted .opd-main-writing > section {
+    display: none !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper.opd-paper-preprinted > .opd-parchi-footer > div:first-child {
+    display: none !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper.opd-paper-preprinted > .opd-parchi-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: flex-end !important;
+    flex: 0 0 auto !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  html body:has(.opd-workspace .opd-parchi-paper.opd-paper-preprinted)
+    .opd-workspace .print-prescription .opd-parchi-paper.opd-paper-preprinted .opd-signature {
+    display: block !important;
+    margin-left: auto !important;
+    text-align: center !important;
+  }
+}
