@@ -145,7 +145,7 @@ export default function Dashboard() {
 
           supabase
             .from('invoices')
-            .select('total_amount, paid_amount')
+            .select('total_amount, paid_amount, consolidated_into_invoice_id, status')
             .eq('clinic_id', clinicId)
             .limit(1000),
         ]);
@@ -176,15 +176,25 @@ export default function Dashboard() {
         if (invoiceError) {
           setMessage(invoiceError.message);
         } else {
+          // Consolidated source invoices are already represented by their
+          // final invoice. Exclude them from dashboard totals to prevent
+          // double-counting the same IPD charges.
+          const billableInvoices = (invoices ?? []).filter(
+            (invoice) =>
+              !invoice.consolidated_into_invoice_id &&
+              invoice.status !== 'cancelled' &&
+              invoice.status !== 'void'
+          );
+
           setInvoiceTotal(
-            (invoices ?? []).reduce(
+            billableInvoices.reduce(
               (sum, invoice) => sum + Number(invoice.total_amount || 0),
               0
             )
           );
 
           setDueTotal(
-            (invoices ?? []).reduce(
+            billableInvoices.reduce(
               (sum, invoice) =>
                 sum +
                 Math.max(
