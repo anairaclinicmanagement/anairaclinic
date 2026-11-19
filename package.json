@@ -1,6 +1,6 @@
 {
   "name": "anaira-healthcare-management-system",
-  "version": "0.8.163",
+  "version": "0.8.168",
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
