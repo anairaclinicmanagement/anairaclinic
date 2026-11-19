@@ -13,6 +13,7 @@ const links = [
   {module:'consultation',href:'/consultation',label:'Consultation / EMR',icon:Stethoscope},
   {module:'prescriptions',href:'/prescriptions',label:'Prescription',icon:ReceiptText},
   {module:'billing',href:'/billing',label:'Billing & Payments',icon:CreditCard},
+  {module:'reports',href:'/reports',label:'Reports & Analytics',icon:FileBarChart},
   {module:'pharmacy',href:'/pharmacy',label:'Pharmacy & Stock',icon:Pill},
   {module:'laboratory',href:'/laboratory',label:'Laboratory',icon:FlaskConical},
   {module:'multi_branch',href:'/branches',label:'Branches',icon:Building2},
@@ -37,7 +38,6 @@ const links = [
   {module:'clinical_quality',href:'/clinical-quality',label:'Clinical Quality',icon:ClipboardCheck},
   {href:'/support',label:'Support Centre',icon:LifeBuoy},
   {module:'patient_portal',href:'/patient-portal',label:'Patient Portal Requests',icon:Users},
-  {module:'reports',href:'/reports',label:'Reports & Analytics',icon:FileBarChart},
   {module:'offline_sync',href:'/sync',label:'Sync & Recovery',icon:RefreshCw},
   {href:'/settings',label:'Clinic Settings',icon:Settings}
 ];
@@ -66,7 +66,7 @@ export default function Sidebar() {
  ];
  const roleModules: Record<string,string[]> = { owner: ['dashboard','opd','patients','appointments','consultation','prescriptions','billing','pharmacy','laboratory','multi_branch','staff','doctors','ipd','radiology','operation_theatre','emergency','blood_bank','cssd','diet','ambulance','procurement','asset_management','insurance','hr_payroll','documents','telemedicine','referrals','clinical_quality','patient_portal','reports','offline_sync'], admin: ['dashboard','opd','patients','appointments','consultation','prescriptions','billing','pharmacy','laboratory','multi_branch','staff','doctors','ipd','radiology','operation_theatre','emergency','blood_bank','cssd','diet','ambulance','procurement','asset_management','insurance','hr_payroll','documents','telemedicine','referrals','clinical_quality','patient_portal','reports','offline_sync'], doctor:['opd','patients','appointments','consultation','prescriptions','laboratory','radiology','ipd','reports','referrals','telemedicine'], radiology_technician:['radiology'], xray_technician:['radiology'], ultrasound_technician:['radiology'], ct_mri_technician:['radiology'], nurse:['patients','appointments','ipd','laboratory','prescriptions','reports'], pharmacist:['pharmacy'], lab_technician:['laboratory'], receptionist:['opd','patients','appointments','billing'], accountant:['reports'], staff:[] };
  const isManagementRole=['owner','admin'].includes(role.toLowerCase());
- const visibleLinks = isSuperAdminRoute ? [] : links.filter(link => ((!('module' in link) || typeof link.module !== 'string' || (link.module==='dashboard'&&isManagementRole) || link.href==='/opd' || ((link.module==='staff'||link.href==='/doctors')&&isManagementRole) || enabledModules.includes(link.module) || (link.module==='staff'&&enabledModules.includes('hr_payroll'))) && (isManagementRole || ('module' in link) || link.href==='/support') && (!roleModules[role.toLowerCase()] || !('module' in link) || typeof link.module !== 'string' || roleModules[role.toLowerCase()].includes(link.module))));
+ const visibleLinks = isSuperAdminRoute ? [] : links.filter(link => ((!('module' in link) || typeof link.module !== 'string' || (link.module==='dashboard'&&isManagementRole) || (link.module==='reports'&&isManagementRole) || link.href==='/opd' || ((link.module==='staff'||link.href==='/doctors')&&isManagementRole) || enabledModules.includes(link.module) || (link.module==='staff'&&enabledModules.includes('hr_payroll'))) && (isManagementRole || ('module' in link) || link.href==='/support') && (!roleModules[role.toLowerCase()] || !('module' in link) || typeof link.module !== 'string' || roleModules[role.toLowerCase()].includes(link.module))));
  const mobilePriority=['/','/opd','/patients','/billing','/pharmacy'];
  const primaryMobileLinks=mobilePriority.map(href=>visibleLinks.find(x=>x.href===href)).filter((link): link is (typeof visibleLinks)[number] => Boolean(link));
  const mobileLinks=[...primaryMobileLinks,...visibleLinks.filter(x=>!primaryMobileLinks.some(p=>p.href===x.href))];
