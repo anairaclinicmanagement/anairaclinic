@@ -37,6 +37,8 @@
   "exclude": [
     "node_modules",
     "**/supabase/functions/**",
-    "supabase/functions"
+    "supabase/functions",
+    "Anaira_Healthcare_v*/**",
+    "**/Anaira_Healthcare_v*/**"
   ]
 }

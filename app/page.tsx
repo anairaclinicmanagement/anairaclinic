@@ -14,6 +14,12 @@ import {
   Pill,
   Activity,
   Building2,
+  Bed,
+  Stethoscope,
+  ArrowUpRight,
+  Clock3,
+  ReceiptText,
+  HeartPulse,
 } from 'lucide-react';
 
 import { supabase } from '@/lib/supabase';
@@ -49,6 +55,9 @@ export default function Dashboard() {
   const [todayAppointments, setTodayAppointments] = useState(0);
   const [invoiceTotal, setInvoiceTotal] = useState(0);
   const [dueTotal, setDueTotal] = useState(0);
+  const [activeAdmissions, setActiveAdmissions] = useState(0);
+  const [activeBeds, setActiveBeds] = useState(0);
+  const [occupiedBeds, setOccupiedBeds] = useState(0);
   const [nextAppointments, setNextAppointments] = useState<Appointment[]>([]);
   const [message, setMessage] = useState('');
 
@@ -119,6 +128,8 @@ export default function Dashboard() {
           { count: patientCount, error: patientError },
           { data: appointments, error: appointmentError },
           { data: invoices, error: invoiceError },
+          { data: admissions, error: admissionsError },
+          { data: beds, error: bedsError },
         ] = await Promise.all([
           supabase
             .from('clinics')
@@ -148,6 +159,20 @@ export default function Dashboard() {
             .select('total_amount, paid_amount, consolidated_into_invoice_id, status')
             .eq('clinic_id', clinicId)
             .limit(1000),
+
+          supabase
+            .from('admissions')
+            .select('id, status, bed_id')
+            .eq('clinic_id', clinicId)
+            .in('status', ['admitted', 'transferred'])
+            .limit(1000),
+
+          supabase
+            .from('room_beds')
+            .select('id, active')
+            .eq('clinic_id', clinicId)
+            .eq('active', true)
+            .limit(2000),
         ]);
 
         if (cancelled) return;
@@ -171,6 +196,16 @@ export default function Dashboard() {
             (appointments ?? []) as unknown as Appointment[]
           );
           setTodayAppointments(appointments?.length ?? 0);
+        }
+
+        if (admissionsError) setMessage(admissionsError.message);
+        else setActiveAdmissions(admissions?.length ?? 0);
+
+        if (bedsError) setMessage(bedsError.message);
+        else {
+          setActiveBeds(beds?.length ?? 0);
+          const occupied = new Set((admissions ?? []).map((a) => a.bed_id).filter(Boolean));
+          setOccupiedBeds(occupied.size);
         }
 
         if (invoiceError) {
@@ -224,288 +259,64 @@ export default function Dashboard() {
     };
   }, []);
 
+  const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+  const todayLabel = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
   return (
-    <>
-      <div className="page-heading">
-        <div>
-          <div className="eyebrow">
-            ANAIRA HEALTHCARE · LIVE WORKSPACE
-          </div>
-
-          <h1>
-            {greeting}, {clinicName}
-          </h1>
-
-          <p>
-            Your clinic&apos;s patients, appointments and billing
-            at a glance.
-          </p>
+    <div className="premium-dashboard">
+      <section className="dash-hero">
+        <div className="dash-hero-copy">
+          <span className="dash-kicker"><HeartPulse size={14}/> ANAIRA HEALTHCARE · CLINIC OVERVIEW</span>
+          <h1>{greeting}, {clinicName}</h1>
+          <p>Your hospital at a glance — patient care, daily operations and financial performance.</p>
+          <div className="dash-hero-meta"><span><Clock3 size={14}/>{todayLabel}</span><span className="dash-live"><i/> Live clinic data</span></div>
         </div>
-
-        <Link href="/patients" className="primary-button">
-          <Plus size={16} />
-          Register patient
-        </Link>
-      </div>
+        <div className="dash-hero-actions">
+          <Link href="/appointments" className="dash-outline"><CalendarPlus size={16}/> Appointments</Link>
+          <Link href="/patients" className="dash-primary"><Plus size={16}/> Register patient</Link>
+        </div>
+        <div className="dash-hero-art"><div className="dash-orbit orbit-one"/><div className="dash-orbit orbit-two"/><div className="dash-cross">+</div><HeartPulse size={82}/></div>
+      </section>
 
       {message && <div className="notice">{message}</div>}
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-top">
-            Total patients
-            <span className="stat-icon">
-              <Users size={17} />
-            </span>
-          </div>
+      <div className="dash-section-head"><div><span>PERFORMANCE SNAPSHOT</span><h2>Today&apos;s overview</h2></div><small>Clinic-scoped live records</small></div>
+      <section className="dash-kpi-grid">
+        <article className="dash-kpi kpi-blue"><div className="dash-kpi-top"><span>Total patients</span><i><Users size={19}/></i></div><strong>{patients.toLocaleString('en-IN')}</strong><small>Active patient records</small><Link href="/patients">View patients <ArrowUpRight size={13}/></Link></article>
+        <article className="dash-kpi kpi-violet"><div className="dash-kpi-top"><span>Today&apos;s appointments</span><i><CalendarPlus size={19}/></i></div><strong>{todayAppointments}</strong><small>Scheduled for today</small><Link href="/appointments">Open schedule <ArrowUpRight size={13}/></Link></article>
+        <article className="dash-kpi kpi-teal"><div className="dash-kpi-top"><span>Active IPD admissions</span><i><Bed size={19}/></i></div><strong>{activeAdmissions}</strong><small>Currently admitted patients</small><Link href="/ipd">Open IPD <ArrowUpRight size={13}/></Link></article>
+        <article className="dash-kpi kpi-green"><div className="dash-kpi-top"><span>Available beds</span><i><Stethoscope size={19}/></i></div><strong>{Math.max(0, activeBeds - occupiedBeds)}</strong><small>{occupiedBeds} occupied · {activeBeds} active beds</small><Link href="/ipd">Manage beds <ArrowUpRight size={13}/></Link></article>
+        <article className="dash-kpi kpi-gold"><div className="dash-kpi-top"><span>Invoice value</span><i><Wallet size={19}/></i></div><strong>{formatCurrency(invoiceTotal)}</strong><small>Non-cancelled invoices</small><Link href="/billing">View billing <ArrowUpRight size={13}/></Link></article>
+        <article className="dash-kpi kpi-rose"><div className="dash-kpi-top"><span>Outstanding dues</span><i><CreditCard size={19}/></i></div><strong>{formatCurrency(dueTotal)}</strong><small>Pending collection balance</small><Link href="/billing">Collect payment <ArrowUpRight size={13}/></Link></article>
+      </section>
 
-          <div className="stat-value">
-            {patients.toLocaleString('en-IN')}
-          </div>
-
-          <div className="stat-foot">Active patient records</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-top">
-            Today&apos;s appointments
-            <span className="stat-icon blue">
-              <CalendarPlus size={17} />
-            </span>
-          </div>
-
-          <div className="stat-value">{todayAppointments}</div>
-
-          <div className="stat-foot">Scheduled today</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-top">
-            Invoice total
-            <span className="stat-icon gold">
-              <Wallet size={17} />
-            </span>
-          </div>
-
-          <div className="stat-value">
-            ₹{invoiceTotal.toLocaleString('en-IN')}
-          </div>
-
-          <div className="stat-foot">From loaded invoices</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-top">
-            Outstanding balance
-            <span className="stat-icon rose">
-              <CreditCard size={17} />
-            </span>
-          </div>
-
-          <div className="stat-value">
-            ₹{dueTotal.toLocaleString('en-IN')}
-          </div>
-
-          <div className="stat-foot">
-            Invoice total less recorded payments
+      <section className="dash-main-grid">
+        <div className="dash-panel dash-appointments">
+          <div className="dash-panel-head"><div><span>DAILY SCHEDULE</span><h2>Today&apos;s appointments</h2><p>Upcoming patient visits for this clinic</p></div><Link href="/appointments">View all <ArrowUpRight size={14}/></Link></div>
+          <div className="dash-appointment-list">
+            {nextAppointments.slice(0, 7).map((appointment) => {
+              const patient = appointment.patients;
+              const name = [patient?.first_name, patient?.last_name].filter(Boolean).join(' ') || 'Patient';
+              return <div className="dash-appointment-row" key={appointment.id}><div className="dash-time">{new Date(appointment.appointment_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div><div className="dash-avatar">{name.slice(0,1).toUpperCase()}</div><div className="dash-patient"><b>{name}</b><small>{patient?.uhid || 'UHID pending'} · {appointment.visit_type || 'Consultation'}</small></div><span className={`dash-status ${appointment.status.toLowerCase()==='completed'?'done':''}`}>{appointment.status}</span></div>;
+            })}
+            {nextAppointments.length===0 && <div className="dash-empty"><CalendarPlus size={25}/><b>No appointments scheduled</b><span>There are no visits in today&apos;s schedule.</span><Link href="/appointments">Book an appointment</Link></div>}
           </div>
         </div>
-      </div>
-
-      <div className="content-grid">
-        <div>
-          <section className="panel">
-            <div className="panel-heading">
-              <div>
-                <h2>Today&apos;s appointments</h2>
-                <p>Schedule for your active clinic</p>
-              </div>
-
-              <Link className="text-link" href="/appointments">
-                View schedule →
-              </Link>
-            </div>
-
-            <div className="appointment-list">
-              {nextAppointments.map((appointment) => {
-                const patient = appointment.patients;
-
-                return (
-                  <div
-                    className="appointment-row"
-                    key={appointment.id}
-                  >
-                    <div className="time-block">
-                      {new Date(
-                        appointment.appointment_at
-                      ).toLocaleTimeString('en-IN', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </div>
-
-                    <div className="patient-avatar green">
-                      {(patient?.first_name || 'P').slice(0, 1)}
-                      {(patient?.last_name || '').slice(0, 1)}
-                    </div>
-
-                    <div className="patient-info">
-                      <b>
-                        {[
-                          patient?.first_name,
-                          patient?.last_name,
-                        ]
-                          .filter(Boolean)
-                          .join(' ') || 'Patient'}
-                      </b>
-
-                      <small>
-                        {patient?.uhid || ''}
-                        {' · '}
-                        {appointment.visit_type}
-                      </small>
-                    </div>
-
-                    <span className="tag waiting">
-                      {appointment.status}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {nextAppointments.length === 0 && (
-                <div className="table-empty">
-                  No appointments scheduled for today.
-                </div>
-              )}
-            </div>
-          </section>
+        <div className="dash-side-stack">
+          <div className="dash-panel dash-quick-panel"><div className="dash-panel-head"><div><span>SHORTCUTS</span><h2>Quick actions</h2></div></div><div className="dash-action-grid">
+            <Link href="/patients"><i><Users size={18}/></i><b>New patient</b><small>Register profile</small></Link>
+            <Link href="/appointments"><i><CalendarPlus size={18}/></i><b>Book visit</b><small>Manage schedule</small></Link>
+            <Link href="/opd"><i><ClipboardPlus size={18}/></i><b>OPD desk</b><small>Patient consultation</small></Link>
+            <Link href="/ipd"><i><Bed size={18}/></i><b>IPD admission</b><small>Ward &amp; bed management</small></Link>
+            <Link href="/billing"><i><ReceiptText size={18}/></i><b>Create invoice</b><small>Billing &amp; payments</small></Link>
+            <Link href="/laboratory"><i><FlaskConical size={18}/></i><b>Lab orders</b><small>Tests &amp; results</small></Link>
+            <Link href="/pharmacy"><i><Pill size={18}/></i><b>Pharmacy</b><small>Stock &amp; dispensing</small></Link>
+            <Link href="/reports"><i><Activity size={18}/></i><b>Reports</b><small>Clinic performance</small></Link>
+          </div></div>
+          <div className="dash-panel dash-collection-panel"><div className="dash-panel-head"><div><span>REVENUE MONITOR</span><h2>Billing summary</h2></div><Link href="/billing">Details <ArrowUpRight size={13}/></Link></div><div className="dash-money-row"><span>Invoice value</span><b>{formatCurrency(invoiceTotal)}</b></div><div className="dash-money-row"><span>Outstanding</span><b className="money-due">{formatCurrency(dueTotal)}</b></div><div className="dash-collection-track"><i style={{width:`${invoiceTotal>0?Math.max(0,Math.min(100,((invoiceTotal-dueTotal)/invoiceTotal)*100)):0}%`}}/></div><small className="dash-collection-caption">{invoiceTotal>0?`${Math.round(Math.max(0,Math.min(100,((invoiceTotal-dueTotal)/invoiceTotal)*100)))}% collected against invoice value`:'No invoice collection data yet'}</small></div>
         </div>
-
-        <div>
-          <section className="panel">
-            <div className="panel-heading">
-              <div>
-                <h2>Quick actions</h2>
-                <p>Clinic operations</p>
-              </div>
-            </div>
-
-            <div className="quick-grid">
-              <Link className="quick-action" href="/patients">
-                <span className="quick-icon">
-                  <Users size={17} />
-                </span>
-                <span>
-                  <b>New patient</b>
-                  <small>Register profile</small>
-                </span>
-              </Link>
-
-              <Link className="quick-action" href="/appointments">
-                <span className="quick-icon">
-                  <CalendarPlus size={17} />
-                </span>
-                <span>
-                  <b>Book appointment</b>
-                  <small>Schedule a visit</small>
-                </span>
-              </Link>
-
-              <Link className="quick-action" href="/consultation">
-                <span className="quick-icon">
-                  <ClipboardPlus size={17} />
-                </span>
-                <span>
-                  <b>Consultation</b>
-                  <small>Clinical notes &amp; vitals</small>
-                </span>
-              </Link>
-
-              <Link className="quick-action" href="/billing">
-                <span className="quick-icon">
-                  <CreditCard size={17} />
-                </span>
-                <span>
-                  <b>Create bill</b>
-                  <small>Invoice &amp; collection</small>
-                </span>
-              </Link>
-
-              <Link className="quick-action" href="/pharmacy">
-                <span className="quick-icon">
-                  <Pill size={17} />
-                </span>
-                <span>
-                  <b>Pharmacy</b>
-                  <small>Batch stock &amp; expiry</small>
-                </span>
-              </Link>
-
-              <Link className="quick-action" href="/laboratory">
-                <span className="quick-icon">
-                  <FlaskConical size={17} />
-                </span>
-                <span>
-                  <b>Laboratory</b>
-                  <small>Tests, orders, results</small>
-                </span>
-              </Link>
-
-              <Link className="quick-action" href="/settings">
-                <span className="quick-icon">
-                  <Building2 size={17} />
-                </span>
-                <span>
-                  <b>Clinic settings</b>
-                  <small>Readiness &amp; modules</small>
-                </span>
-              </Link>
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-heading">
-              <div>
-                <h2>System readiness</h2>
-                <p>Be aware of unfinished capabilities</p>
-              </div>
-
-              <Activity size={17} color="#7c9b8c" />
-            </div>
-
-            <div className="activity-row">
-              <i className="activity-dot" />
-              <div>
-                <b>Clinic Operations</b>
-                <small>
-                  Manage your daily clinic activities in one place.
-                </small>
-              </div>
-            </div>
-
-            <div className="activity-row">
-              <i className="activity-dot" />
-              <div>
-                <b>Patient Care</b>
-                <small>
-                  Keep patient records and appointments organized.
-                </small>
-              </div>
-            </div>
-
-            <div className="activity-row">
-              <i className="activity-dot" />
-              <div>
-                <b>Hospital Services</b>
-                <small>
-                  Access OPD, IPD, pharmacy and laboratory services.
-                </small>
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
-    </>
+      </section>
+      <section className="dash-footer-strip"><div><i><Activity size={18}/></i><span><b>Clinic operations at a glance</b><small>Use the shortcuts to move directly to patient care and hospital workflows.</small></span></div><Link href="/reports">Open reports <ArrowUpRight size={14}/></Link></section>
+    </div>
   );
 }

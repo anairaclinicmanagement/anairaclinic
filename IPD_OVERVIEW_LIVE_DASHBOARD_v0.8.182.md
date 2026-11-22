@@ -1,0 +1,3 @@
+# IPD Overview Live Dashboard — v0.8.182
+
+The Overview tab previously had no content renderer: selecting Overview set `activePanel` to an empty string, while every data panel was guarded by a named `activePanel` value. This release adds a clinic-scoped live overview using the data already loaded by the IPD page: active admissions, active/available/occupied beds, discharged patients, outstanding IPD invoice balance, current admissions, room occupancy, recent IPD invoices, and clinical/nursing/discharge activity counts. Includes navigation shortcuts and a refresh action. No database migration is required.
