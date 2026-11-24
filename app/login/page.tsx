@@ -47,7 +47,8 @@ export default function LoginPage() {
     if (aalError) throw aalError;
     const { data: factors, error: factorError } = await supabase.auth.mfa.listFactors();
     if (factorError) throw factorError;
-    const verified = (factors?.totp || []).filter((factor: TotpFactor) => factor.status === 'verified') as TotpFactor[];
+    const totpFactors = (factors?.totp || []) as TotpFactor[];
+    const verified = totpFactors.filter((factor: TotpFactor) => factor.status === 'verified');
     if (verified.length > 0 && aal?.currentLevel === 'aal2') { await continueToWorkspace(); return; }
     if (verified.length > 0) {
       const selected = verified[0];
@@ -58,6 +59,19 @@ export default function LoginPage() {
       setStage('challenge');
       setMessage('Password accepted. Enter the current 6-digit code from your authenticator app.');
       return;
+    }
+
+    // A previous enrollment can be left in Supabase as `unverified` when the
+    // user closes the page before entering the first OTP. Supabase will reject
+    // another enroll() call with “factor ... already exists”. Remove only these
+    // unverified TOTP enrollments after password authentication, then issue a
+    // fresh QR. Never remove a verified factor here.
+    const pendingFactors = totpFactors.filter((factor: TotpFactor) => factor.status === 'unverified');
+    for (const pending of pendingFactors) {
+      const { error: unenrollError } = await supabase.auth.mfa.unenroll({ factorId: pending.id });
+      if (unenrollError) {
+        throw new Error(`A previous incomplete authenticator setup could not be reset (${unenrollError.message}). Please contact your Anaira Healthcare administrator.`);
+      }
     }
 
     const { data: enrollment, error: enrollError } = await supabase.auth.mfa.enroll({
