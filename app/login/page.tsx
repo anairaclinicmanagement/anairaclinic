@@ -61,25 +61,32 @@ export default function LoginPage() {
       return;
     }
 
-    // A previous enrollment may remain unverified if the browser was closed
-    // before the first OTP. The browser-side unenroll API can reject this
-    // recovery path. Use a server-only Admin MFA endpoint, strictly scoped to
-    // this platform-admin user and this named unverified TOTP factor.
-    // Always ask the server-side Admin API to inspect the account before
-    // creating a factor. Do not depend on the browser listFactors response:
-    // pending factors may be omitted from a client response in some states.
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !sessionData.session?.access_token) {
+    if (sessionError || !sessionData.session?.access_token || !sessionData.session.user?.id) {
       throw new Error('Your authenticated session is missing. Please sign in again.');
     }
-    const recoveryResponse = await fetch('/api/auth/mfa/recover', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
-      cache: 'no-store',
-    });
-    const recoveryResult = await recoveryResponse.json().catch(() => ({}));
-    if (!recoveryResponse.ok || recoveryResult.ok !== true) {
-      throw new Error(recoveryResult.error || 'The incomplete authenticator setup could not be recovered.');
+
+    const ROOT_SUPER_ADMIN_ID = '198137fa-8682-432f-8b7a-e99aebe89ddd';
+    if (sessionData.session.user.id === ROOT_SUPER_ADMIN_ID) {
+      // This server route is deliberately restricted to the root Super Admin.
+      const recoveryResponse = await fetch('/api/auth/mfa/recover', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
+        cache: 'no-store',
+      });
+      const recoveryResult = await recoveryResponse.json().catch(() => ({}));
+      if (!recoveryResponse.ok || recoveryResult.ok !== true) {
+        throw new Error(recoveryResult.error || 'The Super Admin incomplete authenticator setup could not be recovered.');
+      }
+    } else {
+      // Clinic users must never call the root-only recovery endpoint.
+      // Remove only their own unverified TOTP factors, never verified factors.
+      for (const pending of totpFactors.filter((factor: TotpFactor) => factor.status === 'unverified')) {
+        const { error: unenrollError } = await supabase.auth.mfa.unenroll({ factorId: pending.id });
+        if (unenrollError) {
+          throw new Error(`Your incomplete authenticator setup could not be reset (${unenrollError.message}). Please contact your clinic administrator.`);
+        }
+      }
     }
 
     const { data: enrollment, error: enrollError } = await supabase.auth.mfa.enroll({
