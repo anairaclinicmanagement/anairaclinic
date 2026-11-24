@@ -142,6 +142,13 @@ export default function LoginPage() {
   }
 
   const mfaMode = stage !== 'credentials';
+  // Supabase Auth already returns a data URI for TOTP QR codes in supported SDK versions.
+  // Keep it intact; only wrap raw SVG markup as a fallback.
+  const qrImageSrc = qrCode.trim().startsWith('data:')
+    ? qrCode
+    : qrCode.trim().startsWith('<svg')
+      ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qrCode)}`
+      : '';
   return <main className="login-screen">
     <section className="login-brand-panel">
       <div className="login-brand"><img className="login-clinic-logo" src="/anaira-clinic-management-logo.png" alt="Anaira Healthcare Management System"/><span><b>Anaira</b><small>HEALTHCARE MANAGEMENT</small></span></div>
@@ -164,7 +171,7 @@ export default function LoginPage() {
         <button className="login-submit" type="submit" disabled={busy||!configured}>{busy?'Checking credentials…':'Continue securely'} <ArrowRight size={17}/></button>
       </form>}
       {stage === 'enroll' && <form onSubmit={verifyTotp} className="login-form mfa-form">
-        <div className="mfa-qr-wrap"><img className="mfa-qr" src={`data:image/svg+xml;utf8,${encodeURIComponent(qrCode)}`} alt="Authenticator setup QR code"/></div>
+        <div className="mfa-qr-wrap"><img className="mfa-qr" src={qrImageSrc} alt="Authenticator setup QR code"/></div>
         <div className="mfa-secret"><b>Can’t scan the QR code?</b><code>{manualSecret}</code></div>
         <label htmlFor="mfa-enroll-code">6-digit authenticator code</label><div className="login-input-wrap"><Smartphone size={17}/><input id="mfa-enroll-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,8}" maxLength={8} required value={totpCode} onChange={e=>setTotpCode(e.target.value.replace(/[^0-9 ]/g,''))} placeholder="000000"/></div>
         <button className="login-submit" type="submit" disabled={busy||totpCode.replace(/\D/g,'').length!==6}>{busy?'Verifying authenticator…':'Enable MFA & continue'} <ShieldCheck size={17}/></button>
