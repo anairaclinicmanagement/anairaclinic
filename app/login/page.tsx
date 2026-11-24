@@ -65,21 +65,21 @@ export default function LoginPage() {
     // before the first OTP. The browser-side unenroll API can reject this
     // recovery path. Use a server-only Admin MFA endpoint, strictly scoped to
     // this platform-admin user and this named unverified TOTP factor.
-    const pendingFactors = totpFactors.filter((factor: TotpFactor) => factor.status === 'unverified');
-    if (pendingFactors.length > 0) {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session?.access_token) {
-        throw new Error('Your authenticated session is missing. Please sign in again.');
-      }
-      const recoveryResponse = await fetch('/api/auth/mfa/recover', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
-        cache: 'no-store',
-      });
-      const recoveryResult = await recoveryResponse.json().catch(() => ({}));
-      if (!recoveryResponse.ok || recoveryResult.ok !== true) {
-        throw new Error(recoveryResult.error || 'The incomplete authenticator setup could not be recovered.');
-      }
+    // Always ask the server-side Admin API to inspect the account before
+    // creating a factor. Do not depend on the browser listFactors response:
+    // pending factors may be omitted from a client response in some states.
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !sessionData.session?.access_token) {
+      throw new Error('Your authenticated session is missing. Please sign in again.');
+    }
+    const recoveryResponse = await fetch('/api/auth/mfa/recover', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
+      cache: 'no-store',
+    });
+    const recoveryResult = await recoveryResponse.json().catch(() => ({}));
+    if (!recoveryResponse.ok || recoveryResult.ok !== true) {
+      throw new Error(recoveryResult.error || 'The incomplete authenticator setup could not be recovered.');
     }
 
     const { data: enrollment, error: enrollError } = await supabase.auth.mfa.enroll({
