@@ -61,16 +61,24 @@ export default function LoginPage() {
       return;
     }
 
-    // A previous enrollment can be left in Supabase as `unverified` when the
-    // user closes the page before entering the first OTP. Supabase will reject
-    // another enroll() call with “factor ... already exists”. Remove only these
-    // unverified TOTP enrollments after password authentication, then issue a
-    // fresh QR. Never remove a verified factor here.
+    // A previous enrollment may remain unverified if the browser was closed
+    // before the first OTP. The browser-side unenroll API can reject this
+    // recovery path. Use a server-only Admin MFA endpoint, strictly scoped to
+    // this platform-admin user and this named unverified TOTP factor.
     const pendingFactors = totpFactors.filter((factor: TotpFactor) => factor.status === 'unverified');
-    for (const pending of pendingFactors) {
-      const { error: unenrollError } = await supabase.auth.mfa.unenroll({ factorId: pending.id });
-      if (unenrollError) {
-        throw new Error(`A previous incomplete authenticator setup could not be reset (${unenrollError.message}). Please contact your Anaira Healthcare administrator.`);
+    if (pendingFactors.length > 0) {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session?.access_token) {
+        throw new Error('Your authenticated session is missing. Please sign in again.');
+      }
+      const recoveryResponse = await fetch('/api/auth/mfa/recover', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
+        cache: 'no-store',
+      });
+      const recoveryResult = await recoveryResponse.json().catch(() => ({}));
+      if (!recoveryResponse.ok || recoveryResult.ok !== true) {
+        throw new Error(recoveryResult.error || 'The incomplete authenticator setup could not be recovered.');
       }
     }
 
