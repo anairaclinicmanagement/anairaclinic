@@ -25,7 +25,7 @@ rolePaths.managing_director = rolePaths.admin;
 function pathAllowed(path:string, allowed:string[]){return allowed.some(base=>base==='/'?path==='/':path===base||path.startsWith(`${base}/`));}
 const pathModules:Record<string,string>={'/patients':'patients','/appointments':'appointments','/consultation':'consultation','/prescriptions':'prescriptions','/billing':'billing','/pharmacy':'pharmacy','/laboratory':'laboratory','/branches':'multi_branch','/staff':'staff','/doctors':'staff','/ipd':'ipd','/hospital-services':'ipd','/radiology':'radiology','/operation-theatre':'operation_theatre','/emergency':'emergency','/blood-bank':'blood_bank','/cssd':'cssd','/diet':'diet','/ambulance':'ambulance','/procurement':'procurement','/assets':'asset_management','/insurance':'insurance','/hr-payroll':'hr_payroll','/documents':'documents','/telemedicine':'telemedicine','/referrals':'referrals','/clinical-quality':'clinical_quality','/patient-portal':'patient_portal','/sync':'offline_sync'};
 export default function AppShell({ children }: { children: React.ReactNode }) {
- const pathname = usePathname(); const router = useRouter(); const isPublic = pathname === '/login' || pathname === '/setup'; const [checking,setChecking]=useState(!isPublic); const [moduleBlocked,setModuleBlocked]=useState(false);
+ const pathname = usePathname(); const router = useRouter(); const isPublic = pathname === '/login'; const [checking,setChecking]=useState(!isPublic); const [moduleBlocked,setModuleBlocked]=useState(false);
  const [activeClinicName,setActiveClinicName]=useState('Clinic workspace');
  const [searchOpen,setSearchOpen]=useState(false); const [searchText,setSearchText]=useState(''); const [searchBusy,setSearchBusy]=useState(false); const [searchResults,setSearchResults]=useState<any[]>([]);
  const [noticeOpen,setNoticeOpen]=useState(false); const [noticeBusy,setNoticeBusy]=useState(false); const [notices,setNotices]=useState<any[]>([]); const [clinicId,setClinicId]=useState<string|null>(null); const [currentRole,setCurrentRole]=useState('staff'); const [noticeRead,setNoticeRead]=useState<string[]>([]);
@@ -69,6 +69,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   void (async()=>{
    const {data:sessionData}=await supabase.auth.getSession(); if(!alive)return; if(!sessionData.session){router.replace('/login');return;}
    const {data:{user}}=await supabase.auth.getUser();if(!alive||!user)return;
+   const {data:aal,error:aalError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();if(!alive)return;
+   if(aalError){router.replace('/login?mfa=required');return;}
+   const {data:factors,error:factorError}=await supabase.auth.mfa.listFactors();if(!alive)return;
+   const hasVerifiedTotp=(factors?.totp||[]).some((factor:any)=>factor.status==='verified');
+   if(factorError||aal?.currentLevel!=='aal2'||!hasVerifiedTotp){router.replace('/login?mfa=required');return;}
+   if(pathname==='/setup'){setChecking(false);return;}
    const {data:platformAdmin,error:platformError}=await supabase.from('platform_admins').select('active').eq('user_id',user.id).eq('active',true).maybeSingle();if(!alive)return;
    if(platformError){setChecking(false);return;}
    if(platformAdmin?.active){if(!pathname.startsWith('/super-admin')){router.replace('/super-admin');return;}setChecking(false);return;}
