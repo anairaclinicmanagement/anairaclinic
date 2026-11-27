@@ -77,15 +77,37 @@ const secretFiles = [];
 function walk(dir) { for (const ent of fs.readdirSync(dir,{withFileTypes:true})) { if (ent.name==='node_modules'||ent.name==='.next'||ent.name==='.git') continue; const full=path.join(dir,ent.name); if(ent.isDirectory()) walk(full); else if(/^\.env(\.|$)/.test(ent.name)&&ent.name!=='.env.example') secretFiles.push(path.relative(root,full)); } }
 walk(root);
 if (secretFiles.length) errors.push(`Potential secret env files included in source tree: ${secretFiles.join(', ')}`);
+// Keep every assertion before the final PASS/FAIL decision. Earlier versions
+// printed PASS and exited before the doctor/profile-link checks below ran.
+const doctorsSource = fs.readFileSync(path.join(root,'app/doctors/page.tsx'),'utf8');
+for (const required of ['Add Doctor','Save Doctor Details','Create Doctor Login','staff_profile_id','qualification','registration_number']) {
+  if (!doctorsSource.includes(required)) errors.push(`Doctor directory workflow missing: ${required}`);
+}
+const staffFn = fs.readFileSync(path.join(root,'supabase/functions/clinic-create-staff/index.ts'),'utf8');
+for (const required of ['staff_profile_id','Link a previously saved doctor profile','user_id']) {
+  if (!staffFn.includes(required)) errors.push(`Existing doctor profile login-link workflow missing: ${required}`);
+}
+
+// Supabase migration versions must be unique. Duplicate timestamp prefixes
+// make migration history ambiguous and can block CLI migration operations.
+const versions = new Map();
+for (const file of migrations) {
+  const version = file.split('_', 1)[0];
+  const group = versions.get(version) ?? [];
+  group.push(file);
+  versions.set(version, group);
+}
+for (const [version, files] of versions) {
+  if (files.length > 1) errors.push(`Duplicate Supabase migration version ${version}: ${files.join(', ')}`);
+}
+
 console.log(`Anaira Clinic static project verification`);
 console.log(`Routes found: ${routes.length}; SQL migrations found: ${migrations.length}`);
 console.log(`Required files checked: ${mustExist.length}`);
 for (const w of warnings) console.warn(`WARN: ${w}`);
 for (const e of errors) console.error(`FAIL: ${e}`);
-if (errors.length) process.exit(1);
+if (errors.length) {
+  console.error(`FAIL: ${errors.length} verification issue(s) found.`);
+  process.exit(1);
+}
 console.log('PASS: static structure and migration safety checks. This does NOT replace TypeScript, production build, database, browser E2E, or tenant-isolation tests.');
-
-const doctorsSource = fs.readFileSync(path.join(root,'app/doctors/page.tsx'),'utf8');
-for (const required of ['Add Doctor','Save Doctor Details','Create Doctor Login','staff_profile_id','qualification','registration_number']) if (!doctorsSource.includes(required)) errors.push(`Doctor directory workflow missing: ${required}`);
-const staffFn = fs.readFileSync(path.join(root,'supabase/functions/clinic-create-staff/index.ts'),'utf8');
-for (const required of ['staff_profile_id','Link a previously saved doctor profile','user_id']) if (!staffFn.includes(required)) errors.push(`Existing doctor profile login-link workflow missing: ${required}`);
